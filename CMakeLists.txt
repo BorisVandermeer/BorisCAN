@@ -1,0 +1,57 @@
+
+cmake_minimum_required(VERSION 3.21.0)
+project(BorisCAN VERSION 0.0.1)
+
+# Top Level Check
+if( BorisCAN_IS_TOP_LEVEL)
+    SET(IS_TOP_DIR YES)
+    SET(ENABLE_TEST YES)
+else()
+    SET(IS_TOP_DIR NO)
+    SET(ENABLE_TEST NO)
+endif()
+
+# Build Config
+if(IS_TOP_DIR)
+    SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
+    SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+endif()
+
+# DeviceNeeded
+SET(BUILD_ALL ON)
+if(BUILD_ALL)
+    SET(BUILD_NPOS220 ON)
+else()
+    SET(BUILD_NPOS220 ON)
+endif()
+
+# <<<<< Find Dependencies <<<<< #
+
+# >>>>> Find Dependencies >>>>> #
+
+SET(BORIS_CAN_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Build Libs
+
+SET(USING_KVASER ON)
+SET(BUILD_EXAMPLES ON)
+add_subdirectory(src)
+
+SET(BORIS_CAN_LIBRARIES ${BORIS_CAN_LIBRARIES})
+
+if(IS_TOP_DIR)
+    SET(BORIS_CAN_VERSION BorisCAN_VERSION )
+    SET(BORIS_CAN_FOUND YES )
+    SET(BORIS_CAN_LIBRARIES ${BORIS_CAN_LIBRARIES})
+    SET(BORIS_CAN_INCLUDE_DIRS ${BORIS_CAN_INCLUDE_DIRS})
+else()
+    SET(BORIS_CAN_VERSION BorisCAN_VERSION PARENT_SCOPE)
+    SET(BORIS_CAN_FOUND YES PARENT_SCOPE)
+    SET(BORIS_CAN_LIBRARIES ${BORIS_CAN_LIBRARIES} PARENT_SCOPE)
+    SET(BORIS_CAN_INCLUDE_DIRS ${BORIS_CAN_INCLUDE_DIRS} PARENT_SCOPE)
+endif()
+
+#Build Test
+if(ENABLE_TEST) 
+    add_subdirectory(Test)
+endif()
