@@ -115,6 +115,7 @@ unsigned int t = 0;
 
 void SendCan(){
     TXBUFFER[1].ID = 10000;
+    TXBUFFER[1].Type = CAN_MSG_TYPE_STANDARD|CAN_MSG_TYPE_DATA;
     TXBUFFER[1].Datalen = 4;
     TXBUFFER[1].Data[0] = 0x01;
     TXBUFFER[1].Data[1] = 0x02;
@@ -122,7 +123,9 @@ void SendCan(){
     TXBUFFER[1].Data[3] = 0x04;
     TXBUFFER[1].TimeFlag = 0;
     TXBUFFER[0].ID = 10002;
+    TXBUFFER[0].Type = CAN_MSG_TYPE_STANDARD|CAN_MSG_TYPE_DATA;
     TXBUFFER[0].Datalen = 8;
+    TXBUFFER[0].TimeFlag = 0;
     unsigned int * ptr = (unsigned int *)TXBUFFER[0].Data;
     *ptr = t;
     t++;
@@ -140,11 +143,12 @@ int main(int argc,char** argv){
         ChannelID = argv[1][0]-'0';
     }
 
-    signal(SIGINT,[](int){timer.stop();exit(0);});
+    signal(SIGINT,[](int){timer.stop();canh.Close(); exit(0);});
     CAN_Handler::CANDeviceConfig config;
+    config.DeviceID = 0;
     config.ChannelID = ChannelID;
     config.Baudrate = CAN_BAUDRATE_1M;
-    canh.OpenDevice(config);
+    if(!canh.OpenDevice(config)) return 1;
 
     timer.startSync(25,SendCan);
     

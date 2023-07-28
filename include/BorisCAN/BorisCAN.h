@@ -31,7 +31,7 @@ namespace Drivers{
 #define CAN_MSG_TYPE_REMOTE  (0x01U)
 #define CAN_MSG_TYPE_DATA    (0x00U)
 #define CAN_MSG_TYPE_EXTERN  (0x02U)
-#define CAN_MSG_TYPE_STANDARD  (0x10U)
+#define CAN_MSG_TYPE_STANDARD  (0x00U)
 
     struct  CANMsgFrame{
         CAN_MSG_TYPE    Type;
@@ -59,8 +59,8 @@ namespace Drivers{
             int DeviceID;
             int ChannelID;
             CAN_BAUDRATE Baudrate;
-            unsigned int AccCode = 0xFFFFFFFFU;
-            unsigned int AccMask = 0x00000000U;
+            unsigned int AccCode = 0x00000000U;
+            unsigned int AccMask = 0xFFFFFFFFU;
         };
 
     public:        

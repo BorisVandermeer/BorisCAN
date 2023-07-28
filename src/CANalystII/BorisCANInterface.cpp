@@ -89,6 +89,7 @@ namespace Drivers{
 
     int  CAN_Handler::Recieve(CANMsgFrame* Buffer, int _size){
         int size = VCI_GetReceiveNum(VCI_DEVICE_TYPE,Device_ID,Channel_ID);
+        if(_size>size) _size = size;
         VCI_CAN_OBJ rec[_size];
         int reclen=0;
         if((reclen=VCI_Receive(VCI_DEVICE_TYPE,Device_ID,Channel_ID,rec,_size,0))>0)//调用接收函数，如果有数据，进行数据处理显示。
@@ -143,14 +144,27 @@ namespace Drivers{
         return VCI_Transmit(VCI_DEVICE_TYPE,Device_ID,Channel_ID,buf,size);
     }
 
-    // int __attribute__((weak)) CAN_Handler::TransmitSync(CANMsgFrame* Buffer, int size,int timeout){
-    //     cout<< " This Device Don't Support TransmitSync ";
+    int CAN_Handler::TransmitSync(CANMsgFrame* Buffer, int size,int timeout){
+        VCI_CAN_OBJ buf[size];
+        for(int j=0;j<size;j++){
+            buf[j].DataLen = Buffer[j].Datalen;
+            buf[j].ID      = Buffer[j].ID;
+            buf[j].TimeStamp  = Buffer[j].TimeStamp;
+            buf[j].TimeFlag   = Buffer[j].TimeFlag;
+            for(int i = 0; i < Buffer[j].Datalen; i++)
+            {
+                buf[j].Data[i] = Buffer[j].Data[i];
+            }
+            buf[j].RemoteFlag = 0;
+            if(Buffer[j].Type&=CAN_MSG_TYPE_REMOTE)  buf[j].RemoteFlag = 1;
+            buf[j].ExternFlag = 0;
+            if(Buffer[j].Type&=CAN_MSG_TYPE_EXTERN)  buf[j].ExternFlag = 1;
+        }
+        return VCI_Transmit(VCI_DEVICE_TYPE,Device_ID,Channel_ID,buf,size);
+    }
 
-    //     throw " This Device Don't Support TransmitSync ";
-    // }
-
-    bool __attribute__((weak)) CAN_Handler::Close(){
-        VCI_CloseDevice(4,Device_ID);
+    bool CAN_Handler::Close(){
+        return VCI_CloseDevice(4,Device_ID);
     }
 
 }//namespace Drivers

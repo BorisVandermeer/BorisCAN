@@ -41,8 +41,8 @@ namespace Drivers{
         auto baudset = BaduEnumToConfig(config.Baudrate);
         auto stat = canSetBusParams(Device_ID, baudset, 0, 0, 0, 0, 0);
         if(stat != canOK) return false;
-        stat = canSetAcceptanceFilter(Device_ID,config.AccCode,config.AccMask,true);
-        if(stat != canOK) return false;
+        // stat = canSetAcceptanceFilter(Device_ID,config.AccCode,config.AccMask,true);
+        // if(stat != canOK) return false;
         // stat = canSetAcceptanceFilter(Device_ID,config.AccCode,config.AccMask,false);
         // if(stat != canOK) return false;                             
         stat = canBusOn(Device_ID);

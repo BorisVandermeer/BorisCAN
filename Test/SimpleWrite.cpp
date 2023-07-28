@@ -27,6 +27,7 @@ int main(int argc,char** argv){
     config.Baudrate = CAN_BAUDRATE_1M;
     canh.OpenDevice(config);
     TXBUFFER[1].ID = 10000;
+    TXBUFFER[1].Type = CAN_MSG_TYPE_STANDARD|CAN_MSG_TYPE_DATA;
     TXBUFFER[1].Datalen = 4;
     TXBUFFER[1].Data[0] = 0x01;
     TXBUFFER[1].Data[1] = 0x02;
@@ -34,6 +35,7 @@ int main(int argc,char** argv){
     TXBUFFER[1].Data[3] = 0x04;
     TXBUFFER[1].TimeFlag = 0;
     TXBUFFER[0].ID = 10002;
+    TXBUFFER[0].Type = CAN_MSG_TYPE_STANDARD|CAN_MSG_TYPE_DATA;
     TXBUFFER[0].Datalen = 3;
     TXBUFFER[0].Data[0] = 0x02;
     TXBUFFER[0].Data[1] = 0xF3;
