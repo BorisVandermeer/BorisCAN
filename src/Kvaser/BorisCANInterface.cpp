@@ -8,6 +8,7 @@
 *********************************************************************/
 
 #include<vector>
+#include<functional>
 
 #include<canlib.h>
 
@@ -15,9 +16,10 @@
 
 namespace Drivers{
 
-    std::vector<void (*)(const CANCallbackData *)> foos;
+    extern std::vector<void (*)(const CANCallbackData *)> cancallbacks;
+    extern std::vector<void (*)(canNotifyData *)>   kvnotifys;
 
-    static unsigned char BaduEnumToConfig(CAN_BAUDRATE baud){
+    static long BaduEnumToConfig(CAN_BAUDRATE baud){
         if(baud == CAN_BAUDRATE_1M) return canBITRATE_1M;
         else if(baud == CAN_BAUDRATE_500K) return canBITRATE_500K;
         else if(baud == CAN_BAUDRATE_250K) return canBITRATE_250K;
@@ -29,21 +31,8 @@ namespace Drivers{
             throw "Invalid BAUDRATE For This Device";
         }
     }
-    CANCallbackData d;
-    static void notifyCallback(canNotifyData *data){
-        
-        if(data->eventType==canEVENT_RX){
-            d.eventType = BORIS_CAN_EVENT_RX;
-            d.rx.id = data->info.rx.id;
-            d.rx.time = data->info.rx.time;
-            foos[0](&d);
-        } else if (data->eventType==canEVENT_TX){
-            d.eventType = BORIS_CAN_EVENT_TX;
-            d.tx.id = data->info.tx.id;
-            d.tx.time = data->info.tx.time;
-            foos[0](&d);
-        }
-    }
+
+
 
     bool CAN_Handler::OpenDevice(const CANDeviceConfig & config){
         canInitializeLibrary();
@@ -52,9 +41,13 @@ namespace Drivers{
         auto baudset = BaduEnumToConfig(config.Baudrate);
         auto stat = canSetBusParams(Device_ID, baudset, 0, 0, 0, 0, 0);
         if(stat != canOK) return false;
+        stat = canSetAcceptanceFilter(Device_ID,config.AccCode,config.AccMask,true);
+        if(stat != canOK) return false;
+        // stat = canSetAcceptanceFilter(Device_ID,config.AccCode,config.AccMask,false);
+        // if(stat != canOK) return false;                             
         stat = canBusOn(Device_ID);
         if(stat != canOK) return false;
-            
+        
         return true;
     }
 
@@ -67,17 +60,17 @@ namespace Drivers{
     bool CAN_Handler::SetCallBack(void (*callback)(const CANCallbackData *),unsigned int flags){
         
         if(CallBackId == -1){
-            foos.push_back(callback);
-            CallBackId = foos.size()-1;
+            cancallbacks.push_back(callback);
+            CallBackId = cancallbacks.size()-1;
         } else {
-            foos[CallBackId] = callback;
+            cancallbacks[CallBackId] = callback;
         }
 
         unsigned int flag = 0x00U;
         if(flags&BORIS_CAN_EVENT_RX) flag |= canNOTIFY_RX;
         if(flags&BORIS_CAN_EVENT_TX) flag |= canNOTIFY_TX;
-
-        auto stat =  canSetNotify(Device_ID, notifyCallback,flag,nullptr);
+        
+        auto stat =  canSetNotify(Device_ID,kvnotifys[CallBackId],flag,nullptr);
         if(stat != canOK){
             return false;
         }
@@ -95,7 +88,7 @@ namespace Drivers{
             auto stat = canRead(Device_ID, &id, &Buffer[a].Data, &dlc, &flag, &time);
             if(stat!=canOK) break;
             auto & frame = Buffer[a];
-            frame.Type = Unknown;
+            frame.Type = CAN_MSG_TYPE_UNKNOWN;
             frame.ID = id;frame.Datalen = dlc;frame.TimeFlag=flag;frame.TimeStamp=time;
             a++;
         }
@@ -113,7 +106,7 @@ namespace Drivers{
             auto stat = canRead(Device_ID, &id, &Buffer[a].Data, &dlc, &flag, &time);
             if(stat!=canOK) break;
             auto & frame = Buffer[a];
-            frame.Type = Unknown;
+            frame.Type = CAN_MSG_TYPE_UNKNOWN;
             frame.ID = id;frame.Datalen = dlc;frame.TimeFlag=flag;frame.TimeStamp=time;
             a++;
         }
@@ -137,7 +130,7 @@ namespace Drivers{
         }
         while(1){
             auto & frame = Buffer[a];
-            frame.Type = Unknown;
+            frame.Type = CAN_MSG_TYPE_UNKNOWN;
             frame.ID = id;frame.Datalen = dlc;frame.TimeFlag=flag;frame.TimeStamp=time;
             a++;
             auto stat = canRead(Device_ID, &id, &Buffer[a].Data, &dlc, &flag, &time);
@@ -163,7 +156,7 @@ namespace Drivers{
         }
         while(a<size){
             auto & frame = Buffer[a];
-            frame.Type = Unknown;
+            frame.Type = CAN_MSG_TYPE_UNKNOWN;
             frame.ID = id;frame.Datalen = dlc;frame.TimeFlag=flag;frame.TimeStamp=time;
             a++;
             auto stat = canRead(Device_ID, &id, &Buffer[a].Data, &dlc, &flag, &time);

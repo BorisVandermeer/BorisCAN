@@ -26,12 +26,12 @@ namespace Drivers{
         CAN_BAUDRATE_10K  =   10000,
     };
 
-    enum CAN_MSG_TYPE{
-        Unknown,
-        Data,
-        Remote,
-        Extern,
-    };
+#define CAN_MSG_TYPE unsigned char
+#define CAN_MSG_TYPE_UNKNOWN (0x10U)
+#define CAN_MSG_TYPE_REMOTE  (0x01U)
+#define CAN_MSG_TYPE_DATA    (0x00U)
+#define CAN_MSG_TYPE_EXTERN  (0x02U)
+#define CAN_MSG_TYPE_STANDARD  (0x10U)
 
     struct  CANMsgFrame{
         CAN_MSG_TYPE    Type;
@@ -59,8 +59,8 @@ namespace Drivers{
             int DeviceID;
             int ChannelID;
             CAN_BAUDRATE Baudrate;
-            unsigned int AccCode;
-            unsigned int AccMask;
+            unsigned int AccCode = 0xFFFFFFFFU;
+            unsigned int AccMask = 0x00000000U;
         };
 
     public:        

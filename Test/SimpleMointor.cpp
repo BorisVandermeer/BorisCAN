@@ -17,7 +17,7 @@ CANMsgFrame TXBUFFER[100];
 
 
 int main(int argc,char** argv){
-    int ChannelID = 1;
+    int ChannelID = 0;
     if(argc > 2 ){
         cout<<"Invalid Args"<<endl;
     } else if(argc == 2){
