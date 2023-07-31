@@ -90,6 +90,7 @@ namespace Drivers{
     int  CAN_Handler::Recieve(CANMsgFrame* Buffer, int _size){
         int size = VCI_GetReceiveNum(VCI_DEVICE_TYPE,Device_ID,Channel_ID);
         if(_size>size) _size = size;
+        if(size<0) return 0;
         VCI_CAN_OBJ rec[_size];
         int reclen=0;
         if((reclen=VCI_Receive(VCI_DEVICE_TYPE,Device_ID,Channel_ID,rec,_size,0))>0)//调用接收函数，如果有数据，进行数据处理显示。

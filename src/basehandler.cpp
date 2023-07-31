@@ -10,8 +10,6 @@
 #include<vector>
 #include<iostream>
 
-#include<canlib.h>
-
 #include<BorisCAN/BorisCAN.h>
 
 using namespace std;
