@@ -28,8 +28,12 @@ int main(int argc,char** argv){
 
     CAN_Handler::CANDeviceConfig config;
     config.ChannelID = ChannelID;
-    config.Baudrate = CAN_BAUDRATE_1M;
-    canh.OpenDevice(config);
+    config.Baudrate = CAN_BAUDRATE_500K;
+    bool flag = canh.OpenDevice(config);
+    if(flag == false){
+        cout<<"Err Open Device"<<endl;
+        return 1;
+    }
 
     while(1){
         int num = canh.Recieve(RXBUFFER,3);

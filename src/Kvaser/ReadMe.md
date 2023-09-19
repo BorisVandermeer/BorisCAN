@@ -1,6 +1,8 @@
 # Kvaser CAN 驱动
 
 https://www.kvaser.cn/downloads/
+https://www.kvaser.com/?s=Kvaser+Linux+Drivers+and+SDK&utm_source=software&utm_ean=7330130980754&utm_status=latest
+
 下载：
     Kvaser Linux Drivers and SDK 支持绝大多数Kvaser设备的Linux驱动与SDK，专用于Kvaser的特有API。如要使用SocketCAN，请勿安装。
 
