@@ -66,6 +66,7 @@ namespace Drivers{
     public:        
         CAN_Handler() = default;
         bool OpenDevice(const CANDeviceConfig &config);
+        bool OpenDevice(const CANDeviceConfig *pconfig) {return OpenDevice(*pconfig);}
         bool isOpen();
         bool Close();
         bool SetCallBack(void (*callback)(const CANCallbackData *),unsigned int flags);
